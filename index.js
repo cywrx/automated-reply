@@ -1,7 +1,8 @@
+
 const { Client } = require('discord.js-selfbot-v13');
 const client = new Client();
 
-const TOKEN = "ur token";
+const TOKEN = "TOKEN_HERE";
 
 let replyConfig = {
     targetUser: null,
@@ -14,9 +15,10 @@ let replyConfig = {
 client.on('ready', () => console.log(`online: ${client.user.tag}`));
 
 client.on('messageCreate', async (msg) => {
+    
     if (msg.author.id !== client.user.id) {
         if (replyConfig.active && msg.author.id === replyConfig.targetUser) {
-
+            
             const isTargetChannel = msg.channel.id === replyConfig.targetChannel;
             const isDM = msg.channel.type === 'DM' && replyConfig.targetChannel === "dm";
 
@@ -24,6 +26,10 @@ client.on('messageCreate', async (msg) => {
                 setTimeout(async () => {
                     try {
                         await msg.reply(replyConfig.replyText);
+
+                        const time = new Date().toLocaleTimeString();
+                        console.log(`[${time}] Replied to ${msg.author.tag}: "${msg.content}"`);
+                        
                     } catch (err) { console.error("err", err.message); }
                 }, replyConfig.delayMs);
             }
@@ -59,4 +65,3 @@ client.on('messageCreate', async (msg) => {
 });
 
 client.login(TOKEN);
-
