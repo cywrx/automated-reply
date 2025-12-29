@@ -1,7 +1,7 @@
 const { Client } = require('discord.js-selfbot-v13');
 const client = new Client();
 
-const TOKEN = "TOKEN";
+const TOKEN = "ur token";
 
 let replyConfig = {
     targetUser: null,
@@ -11,21 +11,22 @@ let replyConfig = {
     active: false
 };
 
-client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}`);
-});
+client.on('ready', () => console.log(`online: ${client.user.tag}`));
 
 client.on('messageCreate', async (msg) => {
     if (msg.author.id !== client.user.id) {
-        if (replyConfig.active && 
-            msg.author.id === replyConfig.targetUser && 
-            msg.channel.id === replyConfig.targetChannel) {
-            
-            setTimeout(async () => {
-                try {
-                    await msg.channel.send(replyConfig.replyText);
-                } catch (err) { console.error("err", err.message); }
-            }, replyConfig.delayMs);
+        if (replyConfig.active && msg.author.id === replyConfig.targetUser) {
+
+            const isTargetChannel = msg.channel.id === replyConfig.targetChannel;
+            const isDM = msg.channel.type === 'DM' && replyConfig.targetChannel === "dm";
+
+            if (isTargetChannel || isDM) {
+                setTimeout(async () => {
+                    try {
+                        await msg.reply(replyConfig.replyText);
+                    } catch (err) { console.error("err", err.message); }
+                }, replyConfig.delayMs);
+            }
         }
         return;
     }
@@ -47,7 +48,7 @@ client.on('messageCreate', async (msg) => {
 
         replyConfig = {
             targetUser: lines[1].trim(),
-            targetChannel: lines[2].trim(),
+            targetChannel: lines[2].trim().toLowerCase(),
             replyText: lines[3].trim(),
             delayMs: (parseInt(lines[4]) || 0) * 1000,
             active: true
